@@ -1,0 +1,137 @@
+{
+  "start_verbs": [
+    "begins",
+    "starts"
+  ],
+  "robot_types": [
+    "Unipedal",
+    "Bipedal",
+    "Quadrupedal",
+    "Arachnid",
+    "Radial",
+    "Aeronautical"
+  ],
+  "adverbs": {
+    "a": [
+      "absentmindedly",
+      "affectionately",
+      "annoyingly"
+    ],
+    "b": [
+      "beautifully",
+      "begrudgingly",
+      "bravely"
+    ],
+    "c": [
+      "carelessly",
+      "clumsily",
+      "cheerfully"
+    ],
+    "d": [
+      "daringly",
+      "deliberately",
+      "diligently"
+    ],
+    "e": [
+      "eagerly",
+      "enthusiastically",
+      "ethically"
+    ],
+    "f": [
+      "fashionably",
+      "frenetically",
+      "freely"
+    ],
+    "g": [
+      "grimly",
+      "gently"
+    ],
+    "h": [
+      "hatefully",
+      "horizontally"
+    ],
+    "i": [
+      "idiotically",
+      "innocently"
+    ],
+    "j": [
+      "joyously",
+      "joylessly"
+    ],
+    "k": [
+      "kindly",
+      "knowledgeably"
+    ],
+    "l": [
+      "luxuriously",
+      "lazily"
+    ],
+    "m": [
+      "madly",
+      "mysteriously"
+    ],
+    "n": [
+      "nervously",
+      "naughtily"
+    ],
+    "o": [
+      "obnoxiously",
+      "offensively"
+    ],
+    "p": [
+      "painfully",
+      "passionately"
+    ],
+    "q": [
+      "quietly",
+      "quirkily"
+    ],
+    "r": [
+      "reluctantly",
+      "righteously"
+    ],
+    "s": [
+      "sheepishly",
+      "sensuously"
+    ],
+    "t": [
+      "tenderly",
+      "truthfully"
+    ],
+    "u": [
+      "unabashedly",
+      "unskillfully"
+    ],
+    "v": [
+      "victoriously",
+      "vigorously"
+    ],
+    "w": [
+      "whole-heartedly",
+      "wildly"
+    ],
+    "x": [
+      "x-traordinarily",
+      "x-citedly"
+    ],
+    "y": [
+      "youthfully"
+    ],
+    "z": [
+      "zealously",
+      "zestfully"
+    ]
+  },
+  "tasks": {
+    "do the dishes": 1000,
+    "sweep the house": 3000,
+    "do the laundry": 10000,
+    "take out the recycling": 4000,
+    "make a sammich": 7000,
+    "mow the lawn": 20000,
+    "rake the leaves": 18000,
+    "give the dog a bath": 14500,
+    "bake some cookies": 8000,
+    "wash the car": 20000
+  }
+}
