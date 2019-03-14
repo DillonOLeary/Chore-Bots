@@ -46,7 +46,7 @@ class Robot:
         :param desc: task description
         """
         # TODO print to a certain output
-        notifications.put('{} the {} completed: {}\n'.format(self.name,
+        notifications.append('{} the {} completed: {}\n'.format(self.name,
                                                                 self.robo_type, desc))
         list_lock.acquire()
         del busy_robots[self.id]
@@ -70,7 +70,7 @@ class Robot:
         activity = threading.Timer(convert_to_sec(to_do[task_id]["eta"]),
                                    self.complete_task, [to_do[task_id]["description"]])
         activity.start()
-        notifications.put('{} {} {} to {}.\n'.format(self.name,
+        notifications.append('{} {} {} to {}.\n'.format(self.name,
                                                         self.get_task_adverb(),
                                                         start_verbs[random.randint(0, len(start_verbs) - 1)],
                                                         to_do[task_id]["description"]))
@@ -104,7 +104,7 @@ def print_tasks(task_list):
     :param task_list: list of tasks
     :return:
     """
-    ret_str = "\n"
+    ret_str = "\nTasks Left To Do:\n"
     for key, val in task_list.items():
         ret_str += "{}: {}, eta {}\n".format(key,
                                              val["description"],
@@ -118,7 +118,7 @@ def print_robots(robots):
     :param robots: the list of robots
     :return:
     """
-    ret_str = ""
+    ret_str = "Robots Available:\n"
     for index in robots:
         ret_str += "{}: {} {}\n".format(robots[index].id,
                                         robots[index].name,
@@ -126,15 +126,18 @@ def print_robots(robots):
     return ret_str
 
 
-def print_notifications(q):
+def print_notifications(notif_list):
     """
     Print out recent notifications
-    :param q: all queued notifications
+    :param notif_list: list of notifications
     :return:
     """
-    ret_str = ""
-    if not q.empty:
-        ret_str += q[-1]
+    ret_str = "Notifications:\n"
+    if len(notif_list) > 4:
+        notif_list = list(reversed(notif_list))[:4]
+        notif_list = reversed(notif_list)
+    for elem in notif_list:
+        ret_str += elem
     return ret_str
 
 
@@ -144,6 +147,8 @@ def update_interface():
     the interface
     :return:
     """
+    for x in range(20):
+        print("\n")
     print(print_tasks(to_do))
     print(print_robots(free_robots))
     print(print_notifications(notifications))
@@ -151,7 +156,7 @@ def update_interface():
 
 if __name__ == "__main__":
     to_do = {}
-    notifications = Queue()
+    notifications = []
     prompt = ""
     for i in range(10):
         to_do[i] = (tasks[random.randint(0, len(tasks) - 1)])
