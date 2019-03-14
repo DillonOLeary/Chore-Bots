@@ -53,6 +53,7 @@ class Robot:
         free_robots[self.id] = self
         list_lock.release()
         update_interface()
+        print(prompt)
 
     def begin_task(self, task_id):
         """
@@ -74,7 +75,7 @@ class Robot:
                                                         start_verbs[random.randint(0, len(start_verbs) - 1)],
                                                         to_do[task_id]["description"]))
         del to_do[task_id]
-        update_interface()
+        # update_interface()
 
 
 def convert_to_sec(milli):
@@ -146,7 +147,6 @@ def update_interface():
     print(print_tasks(to_do))
     print(print_robots(free_robots))
     print(print_notifications(notifications))
-    print(prompt)
 
 
 if __name__ == "__main__":
@@ -166,8 +166,8 @@ if __name__ == "__main__":
         while not valid_input:
             update_interface()
             prompt = "Choose a robot by id: "
-            update_interface()
-            robot_id = input()
+            # update_interface()
+            robot_id = input("Choose a robot by id: ")
             if not robot_id.isdigit():
                 # notifications.put("Input must be a digit, try again\n")
                 print("Input must be a digit, try again")
@@ -175,8 +175,8 @@ if __name__ == "__main__":
             robot_id = int(robot_id)
             if robot_id in free_robots:
                 prompt = "Choose a task by id: "
-                update_interface()
-                assignment_id = input()
+                # update_interface()
+                assignment_id = input("Choose a task by id: ")
                 if not assignment_id.isdigit():
                     # notifications.put("Input must be a digit, try again\n")
                     print("Input must be a digit, try again")
@@ -184,6 +184,7 @@ if __name__ == "__main__":
                 assignment_id = int(assignment_id)
                 if assignment_id in to_do:
                     valid_input = True
+                    prompt = ""
                     break
             # notifications.put("Input '{}' out of range, try again\n".format(robot_id))
             print("Input '{}' out of range, try again".format(robot_id))
