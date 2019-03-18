@@ -6,6 +6,8 @@ import threading
 import random
 import json
 from typing import Dict, Any
+from abc import ABC, abstractmethod
+from bcolors import Bcolors
 
 # FIXME how should I store the global variables?
 # Globals
@@ -16,7 +18,10 @@ free_robots: Dict[Any, Any] = {}  # the robots available to work
 prompt = ""
 
 
-class Robot:
+class Robot(ABC):
+    """
+    Abstract class with behavior shared by all robots
+    """
     # used for ids
     num_robots = 0
 
@@ -43,13 +48,22 @@ class Robot:
         letter_adverbs = adverbs[first_letter]  # adverbs associated with that letter
         return letter_adverbs[random.randint(0, len(letter_adverbs) - 1)]
 
+    def screen_task(self):
+        """
+        Check to see if the task is
+        specially handled by this type of robot
+        :return:
+        """
+        pass
+
+    # @abstractmethod
     def complete_task(self, desc):
         """
         Run once eta has passed
         :param desc: task description
         """
-        notifications.append('{} the {} completed: {}\n'.format(self.name,
-                                                                self.robo_type, desc))
+        notifications.append(Bcolors.OKGREEN + '{} the {} completed: {}\n'.format(self.name,
+                                                                self.robo_type, desc) + Bcolors.ENDC)
         list_lock.acquire()
         del busy_robots[self.id]
         free_robots[self.id] = self
@@ -57,6 +71,7 @@ class Robot:
         update_interface()
         print(prompt)
 
+    # @abstractmethod
     def begin_task(self, task_id):
         """
         This method will create a thread
@@ -64,6 +79,10 @@ class Robot:
         :param task_id: the task assigned
         :return:
         """
+
+        self.screen_task()
+
+
         list_lock.acquire()
         del free_robots[self.id]
         busy_robots[self.id] = self
@@ -71,11 +90,23 @@ class Robot:
         activity = threading.Timer(convert_to_sec(to_do[task_id]["eta"]),
                                    self.complete_task, [to_do[task_id]["description"]])
         activity.start()
-        notifications.append('{} {} {} to {}.\n'.format(self.name,
+        notifications.append(Bcolors.OKBLUE + '{} {} {} to {}.\n'.format(self.name,
                                                         self.get_task_adverb(),
                                                         start_verbs[random.randint(0, len(start_verbs) - 1)],
-                                                        to_do[task_id]["description"]))
+                                                        to_do[task_id]["description"]) + Bcolors.ENDC)
         del to_do[task_id]
+
+
+class Unipedal(Robot):
+    def __init__(self, name, type):
+        super().__init__(name, type)
+
+    def screen_task(self):
+        notifications.append(Bcolors.HEADER + "TESTTT\n" + Bcolors.ENDC)
+
+
+
+
 
 
 def convert_to_sec(milli):
@@ -104,7 +135,7 @@ def print_tasks(task_list):
     :param task_list: list of tasks
     :return:
     """
-    ret_str = "\nTasks Left To Do:\n"
+    ret_str = Bcolors.BOLD + "\nTasks Left To Do:\n" + Bcolors.ENDC
     for key, val in task_list.items():
         ret_str += "{}: {}, eta {} seconds\n".format(key,
                                                      val["description"],
@@ -118,7 +149,7 @@ def print_robots(robots):
     :param robots: the list of robots
     :return:
     """
-    ret_str = "Robots Available:\n"
+    ret_str = Bcolors.BOLD + "Robots Available:\n" + Bcolors.ENDC
     for index in robots:
         ret_str += "{}: {} {}\n".format(robots[index].id,
                                         robots[index].name,
@@ -132,10 +163,12 @@ def print_notifications(notif_list):
     :param notif_list: list of notifications
     :return:
     """
-    ret_str = "Notifications:\n"
+    ret_str = Bcolors.BOLD + "Notifications:\n" + Bcolors.ENDC
     if len(notif_list) > 4:
-        notif_list = list(reversed(notif_list))[:4]
-        notif_list = reversed(notif_list)
+        notif_list = list(reversed(notif_list))[:3]
+        notif_list = list(notif_list)
+        notif_list.append("...\n")
+
     for elem in notif_list:
         ret_str += elem
     return ret_str
