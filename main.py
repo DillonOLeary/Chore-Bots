@@ -39,7 +39,7 @@ def get_robot_type():
         print("{}: {}".format(i, elem))
     type_id = -1
     while type_id >= len(robot.robot_types) or type_id < 0:
-        type_id = get_input_id("Select a type: ")
+        type_id = get_input_id("Select a type by index: ")
     return robot.robot_types[type_id]
 
 
@@ -48,16 +48,25 @@ def create_robot():
     Create a robot of the correct type
     :return:
     """
+    print("")  # Blank line
     name = get_robot_name()
     robo_type = get_robot_type()
-    robo = {
-        'Unipedal': robot.Unipedal(name, robo_type)
-        # 'Bipedal': 2,
-        # 'Quadrupedal': 3,
-        # 'Arachnid': 3,
-        # 'Radial': 3,
-        # 'Aeronautical': 3
-    }[robo_type]
+    # Create a robot of the given type
+    if robo_type == 'Unipedal':
+        robo = robot.Unipedal(name, robo_type)
+    elif robo_type == 'Bipedal':
+        robo = robot.Bipedal(name, robo_type)
+    elif robo_type == 'Quadrupedal':
+        robo = robot.Quadrupedal(name, robo_type)
+    elif robo_type == 'Arachnid':
+        robo = robot.Arachnid(name, robo_type)
+    elif robo_type == 'Radial':
+        robo = robot.Radial(name, robo_type)
+    elif robo_type == 'Aeronautical':
+        robo = robot.Aeronautical(name, robo_type)
+    else:
+        raise RuntimeError("Robot type is not one that is available")
+    print("{} the {} has been activated".format(name, robo_type))
     return robo
 
 
@@ -71,12 +80,10 @@ def get_robots():
 
 def setup():
     """
-    Instantiate the robots and create the
-    tasks
+    Create the tasks
     """
     for i in range(5):
         robot.to_do[i] = (robot.tasks[robot.random.randint(0, len(robot.tasks) - 1)])
-    robot.free_robots = get_robots()
 
 
 def get_task_assignment():
@@ -88,7 +95,7 @@ def get_task_assignment():
     valid_input = False
     robot_id = -1
     assignment_id = -1
-    robot.update_interface()
+    robot.update_interface(robot.to_do, robot.free_robots, robot.notifications)
     while not valid_input:
         robot_id = get_input_id("Choose a robot by id: ")
         if robot_id in robot.free_robots:
@@ -105,7 +112,7 @@ def get_task_assignment():
 def introduce_program():
     """
     Output the strings that introduce the
-    program to the user
+    program to the user and create the robots
     :return:
     """
     print("Oh no! Mom's gonna be home in two minutes and you "
@@ -114,7 +121,9 @@ def introduce_program():
           "chore robots. ")
     print("Complete all the tasks by before mom arrives"
           "to avoid a stern talking to\n")
-    input("Press Enter to continue...")
+    print("First, assemble your forces")
+    robot.free_robots = get_robots()
+    input("Press Enter to get to work!!...")
 
 
 def failure():
@@ -140,9 +149,13 @@ def run():
     """
     start_time = time()
 
+    # FIXME you cannot win with this conditional
     while len(robot.to_do) > 0 and time() < start_time + MAX_TIME:
         robot_id, assignment_id = get_task_assignment()
-        robot.free_robots[robot_id].begin_task(assignment_id)
+        try:
+            robot.free_robots[robot_id].begin_task(assignment_id)
+        except robot.ActionExecutionError:
+            continue
     if len(robot.to_do) > 0 or len(robot.busy_robots) > 0:
         failure()
     else:
