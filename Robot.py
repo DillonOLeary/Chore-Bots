@@ -5,17 +5,20 @@ robot
 import threading
 import random
 import json
-from queue import Queue
+from typing import Dict, Any
+
+# FIXME how should I store the global variables?
+# Globals
+to_do = {}  # the remaining tasks
+notifications = []  # the notifications
+busy_robots = {}  # the robots doing tasks
+free_robots: Dict[Any, Any] = {}  # the robots available to work
+prompt = ""
 
 
 class Robot:
     # used for ids
     num_robots = 0
-
-    # def __str__(self):
-    # return "id:{} name:{} type:{}".format(self.id,
-    #                                       self.name,
-    #                                       self.robo_type)
 
     def __init__(self, name, robo_type):
         """
@@ -45,7 +48,6 @@ class Robot:
         Run once eta has passed
         :param desc: task description
         """
-        # TODO print to a certain output
         notifications.append('{} the {} completed: {}\n'.format(self.name,
                                                                 self.robo_type, desc))
         list_lock.acquire()
@@ -60,7 +62,6 @@ class Robot:
         This method will create a thread
         to complete the task provided
         :param task_id: the task assigned
-        :param eta: the time to completion
         :return:
         """
         list_lock.acquire()
@@ -75,7 +76,6 @@ class Robot:
                                                         start_verbs[random.randint(0, len(start_verbs) - 1)],
                                                         to_do[task_id]["description"]))
         del to_do[task_id]
-        # update_interface()
 
 
 def convert_to_sec(milli):
@@ -106,9 +106,9 @@ def print_tasks(task_list):
     """
     ret_str = "\nTasks Left To Do:\n"
     for key, val in task_list.items():
-        ret_str += "{}: {}, eta {}\n".format(key,
-                                             val["description"],
-                                             val["eta"])
+        ret_str += "{}: {}, eta {} seconds\n".format(key,
+                                                     val["description"],
+                                                     convert_to_sec(val["eta"]))
     return ret_str
 
 
@@ -152,46 +152,3 @@ def update_interface():
     print(print_tasks(to_do))
     print(print_robots(free_robots))
     print(print_notifications(notifications))
-
-
-if __name__ == "__main__":
-    to_do = {}
-    notifications = []
-    prompt = ""
-    for i in range(10):
-        to_do[i] = (tasks[random.randint(0, len(tasks) - 1)])
-
-    free_robots = {0: Robot("Rllen", robot_types[0]),
-                   1: Robot("Yeth", robot_types[4])}
-    busy_robots = {}
-    while len(to_do) > 0:
-        valid_input = False
-        robot_id = -1
-        assignment_id = -1
-        while not valid_input:
-            update_interface()
-            prompt = "Choose a robot by id: "
-            # update_interface()
-            robot_id = input("Choose a robot by id: ")
-            if not robot_id.isdigit():
-                # notifications.put("Input must be a digit, try again\n")
-                print("Input must be a digit, try again")
-                continue
-            robot_id = int(robot_id)
-            if robot_id in free_robots:
-                prompt = "Choose a task by id: "
-                # update_interface()
-                assignment_id = input("Choose a task by id: ")
-                if not assignment_id.isdigit():
-                    # notifications.put("Input must be a digit, try again\n")
-                    print("Input must be a digit, try again")
-                    continue
-                assignment_id = int(assignment_id)
-                if assignment_id in to_do:
-                    valid_input = True
-                    prompt = ""
-                    break
-            # notifications.put("Input '{}' out of range, try again\n".format(robot_id))
-            print("Input '{}' out of range, try again".format(robot_id))
-        free_robots[robot_id].begin_task(assignment_id)
-
