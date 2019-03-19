@@ -26,7 +26,7 @@ def get_robot_name():
     Get the name of the robot
     :return: the name of the robot
     """
-    return input("Enter a robot name: ")
+    return input("Enter a name for your robot: ")
 
 
 def get_robot_type():
@@ -39,7 +39,7 @@ def get_robot_type():
         print("{}: {}".format(i, elem))
     type_id = -1
     while type_id >= len(robot.robot_types) or type_id < 0:
-        type_id = get_input_id("Select a type by index: ")
+        type_id = get_input_id("Select a type for this robot using an index: ")
     return robot.robot_types[type_id]
 
 
@@ -71,10 +71,14 @@ def create_robot():
 
 
 def get_robots():
+    """
+    Create all the robots based on
+    user preference
+    :return: the created robots
+    """
     ret_bots = {}  # Robot dictionary
     for num in range(NUM_ROBOTS):
         ret_bots[num] = create_robot()
-
     return ret_bots
 
 
@@ -123,7 +127,7 @@ def introduce_program():
           " to avoid a stern talking to\n")
     print("First, assemble your forces")
     robot.free_robots = get_robots()
-    input("Press Enter to get to work!!...")
+    input("Press Enter to begin timer and get to work!!...")
 
 
 def failure():
@@ -147,10 +151,6 @@ def run():
     has completed all the tasks or when the time
     runs out
     """
-    # start_time = time()
-
-    # FIXME you cannot win with this conditional
-
     while len(robot.to_do) > 0:
         robot_id, assignment_id = get_task_assignment()
         try:
@@ -165,12 +165,15 @@ def run():
 
 
 def conclude_program():
+    """
+    Final steps, tell user if the
+    program was a success or not
+    :return:
+    """
     if len(robot.to_do) > 0 or len(robot.busy_robots) > 0:
         failure()
     else:
         success()
-    # FIXME this works but I don't think it is the best way to
-    # FIXME exit all threads
     os._exit(1)
 
 
@@ -182,23 +185,28 @@ def program_time_handler(signum, frame):
     conclude_program()
 
 
+def start_timer():
+    """
+    Begin the alarm for the program.
+    When the timer is up the program ends;
+    mom arrives home
+    :return:
+    """
+    signal.signal(signal.SIGALRM, program_time_handler)
+    signal.alarm(MAX_TIME)
+
+
 if __name__ == "__main__":
     # how much time until program stops
-    MAX_TIME = 120
+    MAX_TIME = 120  # Time in seconds until mom arrives
     NUM_ROBOTS = 2  # How many robots
-    NUM_TASKS = 1  # How many tasks to complete
+    NUM_TASKS = 10  # How many tasks to complete
     setup()
     introduce_program()
-
-    # Create a thread which just sends a signal back to main when
-    # the time is up. This signal is handled by main by halting all program
-    # execution, ending the threads, and finishing the program
-
+    start_timer()
     # TODO have the two robots randomly complete 5 tasks each
     # TODO instead of user input, it just takes input from two queues
     # User create queues before execution? Maybe during execution
     # if all robots cannot do task end the program
     # if a task is unacomplishable by the robot, reassign it
-    signal.signal(signal.SIGALRM, program_time_handler)
-    signal.alarm(MAX_TIME)
     run()
