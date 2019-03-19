@@ -2,10 +2,9 @@
 This module handles the main functionality
 of the program
 """
-import multiprocessing
 import os
+import signal
 import robot
-from time import *
 
 
 def get_input_id(prompt):
@@ -121,7 +120,7 @@ def introduce_program():
     print("Luckily you have your secret army of "
           "chore robots. ")
     print("Complete all the tasks by before mom arrives"
-          "to avoid a stern talking to\n")
+          " to avoid a stern talking to\n")
     print("First, assemble your forces")
     robot.free_robots = get_robots()
     input("Press Enter to get to work!!...")
@@ -158,12 +157,36 @@ def run():
             robot.free_robots[robot_id].begin_task(assignment_id)
         except robot.ActionExecutionError:
             continue
+    print("Waiting for robots to complete tasks...")
+    # wait till all threads are completed
+    for thread in robot.bot_threads:
+        thread.join()
+    conclude_program()
+
+
+def conclude_program():
+    if len(robot.to_do) > 0 or len(robot.busy_robots) > 0:
+        failure()
+    else:
+        success()
+    # FIXME this works but I don't think it is the best way to
+    # FIXME exit all threads
+    os._exit(1)
+
+
+def program_time_handler(signum, frame):
+    """
+    Run once the program time expires
+    :return:
+    """
+    conclude_program()
+
 
 if __name__ == "__main__":
     # how much time until program stops
     MAX_TIME = 120
     NUM_ROBOTS = 2  # How many robots
-    NUM_TASKS = 10  # How many tasks to complete
+    NUM_TASKS = 1  # How many tasks to complete
     setup()
     introduce_program()
 
@@ -176,26 +199,6 @@ if __name__ == "__main__":
     # User create queues before execution? Maybe during execution
     # if all robots cannot do task end the program
     # if a task is unacomplishable by the robot, reassign it
-    # Start foo as a process
-    p = multiprocessing.Process(target=run, name="Run")
-    p.start()
-
-    # Wait 10 seconds for foo
-    sleep(10)
-
-    # Terminate foo
-    # Terminate all bot threads, whether or not they have already been terminated
-    p.terminate()
-
-    # Cleanup
-    p.join()
-    # run()
-    if len(robot.to_do) > 0 or len(robot.busy_robots) > 0:
-        failure()
-    else:
-        success()
-    # FIXME this works but I don't think it is the best way to
-    # FIXME exit all threads
-    os._exit(1)
-
-#
+    signal.signal(signal.SIGALRM, program_time_handler)
+    signal.alarm(MAX_TIME)
+    run()
