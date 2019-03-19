@@ -15,6 +15,10 @@ notifications = []  # the notifications
 busy_robots = {}  # the robots doing tasks
 free_robots: Dict[Any, Any] = {}  # the robots available to work
 prompt = ""
+bot_threads = []  # all the threads running
+# active_threads_lock = threading.Lock()
+list_lock = threading.Lock()
+
 
 # Set up all the hard coded values
 with open('config.json', 'r') as json_file:
@@ -23,7 +27,6 @@ with open('config.json', 'r') as json_file:
     robot_types = json["robot_types"]
     tasks = json["tasks"]
     start_verbs = json["start_verbs"]
-list_lock = threading.Lock()
 
 
 class Robot(ABC):
@@ -95,6 +98,7 @@ class Robot(ABC):
         activity = threading.Timer(convert_to_sec(to_do[task_id]["eta"]),
                                    self.complete_task, [to_do[task_id]["description"]])
         activity.start()
+        bot_threads.append(activity)  # append to threads that have run
         notifications.append(Bcolors.OKBLUE + '{} {} {} to {}.\n'.format(self.name,
                                                                          self.get_task_adverb(),
                                                                          start_verbs[
@@ -126,9 +130,6 @@ def handle_problem_task(robot_type, desc, excuse):
 
 
 class Unipedal(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "mow the lawn"
         excuse = "all the walking tires him out"
@@ -137,9 +138,6 @@ class Unipedal(Robot):
 
 
 class Bipedal(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "bake some cookies"
         excuse = "she never learned to cook"
@@ -148,9 +146,6 @@ class Bipedal(Robot):
 
 
 class Quadrupedal(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "do the dishes"
         excuse = "it's clumsy and the dishes always break"
@@ -159,9 +154,6 @@ class Quadrupedal(Robot):
 
 
 class Arachnid(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "give the dog a bath"
         excuse = "all the legs freak out the dog"
@@ -170,9 +162,6 @@ class Arachnid(Robot):
 
 
 class Radial(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "do the laundry"
         excuse = "it gets wrapped up in the blankets"
@@ -181,9 +170,6 @@ class Radial(Robot):
 
 
 class Aeronautical(Robot):
-    # def __init__(self, name, robot_type):
-    #     super().__init__(name, robot_type)
-
     def screen_task(self, desc):
         problem_task = "rake the leaves"
         excuse = "they blow away"
