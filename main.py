@@ -2,6 +2,7 @@
 This module handles the main functionality
 of the program
 """
+import multiprocessing
 import os
 import robot
 from time import *
@@ -82,7 +83,7 @@ def setup():
     """
     Create the tasks
     """
-    for i in range(5):
+    for i in range(NUM_TASKS):
         robot.to_do[i] = (robot.tasks[robot.random.randint(0, len(robot.tasks) - 1)])
 
 
@@ -147,15 +148,48 @@ def run():
     has completed all the tasks or when the time
     runs out
     """
-    start_time = time()
+    # start_time = time()
 
     # FIXME you cannot win with this conditional
-    while len(robot.to_do) > 0 and time() < start_time + MAX_TIME:
+
+    while len(robot.to_do) > 0:
         robot_id, assignment_id = get_task_assignment()
         try:
             robot.free_robots[robot_id].begin_task(assignment_id)
         except robot.ActionExecutionError:
             continue
+
+if __name__ == "__main__":
+    # how much time until program stops
+    MAX_TIME = 120
+    NUM_ROBOTS = 2  # How many robots
+    NUM_TASKS = 10  # How many tasks to complete
+    setup()
+    introduce_program()
+
+    # Create a thread which just sends a signal back to main when
+    # the time is up. This signal is handled by main by halting all program
+    # execution, ending the threads, and finishing the program
+
+    # TODO have the two robots randomly complete 5 tasks each
+    # TODO instead of user input, it just takes input from two queues
+    # User create queues before execution? Maybe during execution
+    # if all robots cannot do task end the program
+    # if a task is unacomplishable by the robot, reassign it
+    # Start foo as a process
+    p = multiprocessing.Process(target=run, name="Run")
+    p.start()
+
+    # Wait 10 seconds for foo
+    sleep(10)
+
+    # Terminate foo
+    # Terminate all bot threads, whether or not they have already been terminated
+    p.terminate()
+
+    # Cleanup
+    p.join()
+    # run()
     if len(robot.to_do) > 0 or len(robot.busy_robots) > 0:
         failure()
     else:
@@ -164,11 +198,4 @@ def run():
     # FIXME exit all threads
     os._exit(1)
 
-
-if __name__ == "__main__":
-    # how much time until program stops
-    MAX_TIME = 120
-    NUM_ROBOTS = 3
-    setup()
-    introduce_program()
-    run()
+#
