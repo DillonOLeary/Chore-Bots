@@ -1,10 +1,16 @@
 """
 This module handles the main functionality
-of the program
+of the program, this includes setting it
+up, running the main loop, and concluding
+it when there are no more tasks to
+do or when time is up
+
+@author: Dillon O'Leary
 """
 import os
 import signal
 import robot
+from utils import Bcolors
 
 
 def get_input_id(prompt):
@@ -35,6 +41,7 @@ def get_robot_type():
     indexing
     :return:
     """
+    print(Bcolors.BOLD + "\nOptions for Robot Types:" + Bcolors.ENDC)
     for i, elem in enumerate(robot.robot_types):
         print("{}: {}".format(i, elem))
     type_id = -1
@@ -66,7 +73,7 @@ def create_robot():
         robo = robot.Aeronautical(name, robo_type)
     else:
         raise RuntimeError("Robot type is not one that is available")
-    print("{} the {} has been activated".format(name, robo_type))
+    print("{} the {} has been activated\n".format(name, robo_type))
     return robo
 
 
@@ -119,15 +126,20 @@ def introduce_program():
     program to the user and create the robots
     :return:
     """
+    for x in range(30):
+        print("\n")
     print("Oh no! Mom's gonna be home in two minutes and you "
-          "haven't done any of your chores!")
-    print("Luckily you have your secret army of "
-          "chore robots. ")
-    print("Complete all the tasks by before mom arrives"
-          " to avoid a stern talking to\n")
-    print("First, assemble your forces")
+          "haven't done any of your chores! "
+          "Luckily you have your secret army of "
+          "chore robots! "
+          "Complete all the tasks before mom arrives "
+          "to avoid a " + Bcolors.UNDERLINE +
+          "stern" + Bcolors.ENDC + " talking to.\n")
+    print("First, assemble your forces - "
+          "but be careful! Each type of robot has a task "
+          "they cannot complete")
     robot.free_robots = get_robots()
-    input("Press Enter to begin timer and get to work!!...")
+    input("Press Enter to begin timer and get to work...")
 
 
 def failure():

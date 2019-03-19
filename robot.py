@@ -1,6 +1,8 @@
 """
 The Robot module handles behaviors for each
 robot
+
+@author: Dillon O'Leary
 """
 import threading
 import random
@@ -18,7 +20,6 @@ prompt = ""
 bot_threads = []  # all the threads running
 # active_threads_lock = threading.Lock()
 list_lock = threading.Lock()
-
 
 # Set up all the hard coded values
 with open('config.json', 'r') as json_file:
@@ -59,6 +60,7 @@ class Robot(ABC):
         letter_adverbs = adverbs[first_letter]  # adverbs associated with that letter
         return letter_adverbs[random.randint(0, len(letter_adverbs) - 1)]
 
+    @abstractmethod
     def screen_task(self, desc):
         """
         Check to see if the task is
@@ -68,14 +70,14 @@ class Robot(ABC):
         """
         pass
 
-    # @abstractmethod
     def complete_task(self, desc):
         """
         Run once eta has passed
         :param desc: task description
         """
-        notifications.append(Bcolors.OKGREEN + '{} the {} completed: {}\n'.format(self.name,
-                                                                                  self.robo_type, desc) + Bcolors.ENDC)
+        notifications.append(Bcolors.OKGREEN +
+                             '{} the {} completed: {}\n'.format(self.name, self.robo_type, desc)
+                             + Bcolors.ENDC)
         list_lock.acquire()
         del busy_robots[self.id]
         free_robots[self.id] = self
@@ -99,11 +101,13 @@ class Robot(ABC):
                                    self.complete_task, [to_do[task_id]["description"]])
         activity.start()
         bot_threads.append(activity)  # append to threads that have run
-        notifications.append(Bcolors.OKBLUE + '{} {} {} to {}.\n'.format(self.name,
-                                                                         self.get_task_adverb(),
-                                                                         start_verbs[
-                                                                             random.randint(0, len(start_verbs) - 1)],
-                                                                         to_do[task_id]["description"]) + Bcolors.ENDC)
+        notifications.append(Bcolors.OKBLUE +
+                             '{} {} {} to {}.\n'.format(self.name,
+                                                        self.get_task_adverb(),
+                                                        start_verbs[
+                                                            random.randint(0, len(start_verbs) - 1)],
+                                                        to_do[task_id]["description"])
+                             + Bcolors.ENDC)
         del to_do[task_id]
 
 
@@ -124,7 +128,7 @@ def handle_problem_task(robot_type, desc, excuse):
     :return:
     """
     notifications.append(Bcolors.HEADER +
-                         "{} cannot {}, {}!\n".format(robot_type, desc, excuse) +
+                         "A {} cannot {}, {}!\n".format(robot_type, desc, excuse) +
                          Bcolors.ENDC)
     raise ActionExecutionError
 
@@ -132,7 +136,7 @@ def handle_problem_task(robot_type, desc, excuse):
 class Unipedal(Robot):
     def screen_task(self, desc):
         problem_task = "mow the lawn"
-        excuse = "all the walking tires him out"
+        excuse = "all the walking tires it out"
         if desc == problem_task:
             handle_problem_task(self.robo_type, desc, excuse)
 
@@ -140,7 +144,7 @@ class Unipedal(Robot):
 class Bipedal(Robot):
     def screen_task(self, desc):
         problem_task = "bake some cookies"
-        excuse = "she never learned to cook"
+        excuse = "it never learned to cook"
         if desc == problem_task:
             handle_problem_task(self.robo_type, desc, excuse)
 
@@ -148,7 +152,7 @@ class Bipedal(Robot):
 class Quadrupedal(Robot):
     def screen_task(self, desc):
         problem_task = "do the dishes"
-        excuse = "it's clumsy and the dishes always break"
+        excuse = "it's clumsy and the dishes will break"
         if desc == problem_task:
             handle_problem_task(self.robo_type, desc, excuse)
 
@@ -164,7 +168,7 @@ class Arachnid(Robot):
 class Radial(Robot):
     def screen_task(self, desc):
         problem_task = "do the laundry"
-        excuse = "it gets wrapped up in the blankets"
+        excuse = "it always gets wrapped up in the blankets"
         if desc == problem_task:
             handle_problem_task(self.robo_type, desc, excuse)
 

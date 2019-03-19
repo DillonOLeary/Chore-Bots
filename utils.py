@@ -1,6 +1,8 @@
 """
 Utilities for the program.
 Includes printing, conversion, and coloring text
+
+@author: Dillon O'Leary
 """
 
 
@@ -67,11 +69,12 @@ def update_interface(to_do, free_robots, notifications):
     the interface
     :return:
     """
-    for x in range(20):
+    for x in range(30):
         print("\n")
     print(print_tasks(to_do))
     print(print_robots(free_robots))
     print(print_notifications(notifications))
+    print(Bcolors.BOLD + "\nTask Assignment:" + Bcolors.ENDC)
 
 
 class Bcolors:
