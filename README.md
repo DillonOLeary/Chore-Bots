@@ -106,3 +106,4 @@ Be creative and have fun! Use this list or create your own features.
 ## Authors
 - Scott Hoffman <https://github.com/scottshane>
 - Olivia Osby <https://github.com/oosby>
+- Dillon O'Leary <https://github.com/dillonoleary>
