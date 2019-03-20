@@ -92,7 +92,7 @@ Tasks have a description and an estimated time to complete.
   ARACHNID: 'Arachnid',
   RADIAL: 'Radial',
   AERONAUTICAL: 'Aeronautical'
-}
+} 
 ```
 
 ## Features to add once the core functionality is complete
