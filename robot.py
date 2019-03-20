@@ -7,16 +7,18 @@ robot
 import threading
 import random
 import json
+from queue import Queue
 from typing import Dict, Any
 from abc import ABC, abstractmethod
-from utils import Bcolors, update_interface, convert_to_sec
+from utils import Bcolors, convert_to_sec, update_interface
+from main import NUM_TASKS
 
 # Globals
 to_do = {}  # the remaining tasks
 notifications = []  # the notifications
 busy_robots = {}  # the robots doing tasks
 free_robots: Dict[Any, Any] = {}  # the robots available to work
-prompt = ""
+prompt = ""  # the input prompt
 bot_threads = []  # all the threads running
 # active_threads_lock = threading.Lock()
 list_lock = threading.Lock()
@@ -47,6 +49,41 @@ class Robot(ABC):
         self.id = Robot.num_robots
         Robot.num_robots += 1
         self.robo_type = robo_type
+        # for automatic task assignment
+        self.queued_tasks = Queue()  # used for auto task assignment
+        self.attempted_task_id = -1  # counter for attempted task id
+
+    def get_available_task(self):
+        """
+        Iterate through all the tasks in
+        the to do list. This is done in case
+        there are tasks that a robot cannot
+        complete. When the attempted task is
+        beyond the ids in the to do list, the
+        robot is no longer useful and taken off
+        of free_robots
+        :return: a task id
+        """
+        self.attempted_task_id += 1
+        while self.attempted_task_id not in to_do:
+            self.attempted_task_id += 1
+            if self.attempted_task_id > NUM_TASKS:
+                free_robots.pop(self.id)
+                return -1
+        return self.attempted_task_id
+
+    def get_task_from_queue(self):
+        """
+        Return the first task from the queue if possible
+        otherwise just choose one from the to_do
+        :return:
+        """
+        # FIXME TEST
+        if not self.queued_tasks.empty():
+            task_id = self.queued_tasks.get()
+        else:
+            task_id = self.get_available_task()
+        return task_id
 
     def get_task_adverb(self):
         """
@@ -127,7 +164,7 @@ def handle_problem_task(robot_type, desc, excuse):
     :param excuse: the reason it cannot be completed
     :return:
     """
-    notifications.append(Bcolors.HEADER +
+    notifications.append(Bcolors.WARNING +
                          "A {} cannot {}, {}!\n".format(robot_type, desc, excuse) +
                          Bcolors.ENDC)
     raise ActionExecutionError
