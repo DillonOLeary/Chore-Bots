@@ -229,7 +229,6 @@ def run(assign_func):
             robot.free_robots[robot_id].begin_task(assignment_id)
         except robot.ActionExecutionError:
             continue
-        # TODO
         except KeyError:
             continue
     print("Waiting for robots to complete tasks...")
@@ -275,9 +274,4 @@ if __name__ == "__main__":
     setup()
     assignment_func = introduce_program()
     start_timer()
-    # TODO have the two robots randomly complete 5 tasks each
-    # TODO instead of user input, it just takes input from two queues
-    # User create queues before execution? Maybe during execution
-    # if all robots cannot do task end the program
-    # if a task is unacomplishable by the robot, reassign it
     run(assignment_func)
