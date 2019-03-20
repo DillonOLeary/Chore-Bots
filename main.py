@@ -9,8 +9,15 @@ do or when time is up
 """
 import os
 import signal
+import time
 import robot
-from utils import Bcolors
+from utils import Bcolors, update_interface, update_interactive_inter
+
+# GLOBALS
+MAX_TIME = 120  # Time in seconds until mom arrives
+NUM_ROBOTS = 2  # How many robots
+NUM_TASKS = 20  # How many tasks to complete
+NUM_AUTO_TASKS = 5  # How many tasks red ventures requires I assign initially
 
 
 def get_input_id(prompt):
@@ -86,6 +93,8 @@ def get_robots():
     ret_bots = {}  # Robot dictionary
     for num in range(NUM_ROBOTS):
         ret_bots[num] = create_robot()
+    # clear prompt
+    robot.prompt = ""
     return ret_bots
 
 
@@ -97,16 +106,16 @@ def setup():
         robot.to_do[i] = (robot.tasks[robot.random.randint(0, len(robot.tasks) - 1)])
 
 
-def get_task_assignment():
+def manual_task_assignment():
     """
-    Get the robot assignment
+    Get the robot assignment from the user
     :return: the robot that should do work
     :return: the task that should be done
     """
     valid_input = False
     robot_id = -1
     assignment_id = -1
-    robot.update_interface(robot.to_do, robot.free_robots, robot.notifications)
+    update_interactive_inter(robot.to_do, robot.free_robots, robot.notifications)
     while not valid_input:
         robot_id = get_input_id("Choose a robot by id: ")
         if robot_id in robot.free_robots:
@@ -118,6 +127,54 @@ def get_task_assignment():
                 break
         print("Input '{}' out of range, try again".format(robot_id))
     return robot_id, assignment_id
+
+
+def auto_task_assignment():
+    """
+    Automatically assign a task
+    :return: the robot that should do work
+    :return: the task that should be done
+    """
+    # if the free robots is empty
+    # FIXME busy waiting!
+    update_interface(robot.to_do, robot.free_robots, robot.notifications)
+    while len(robot.free_robots) == 0:
+        # wait until it is not
+        time.sleep(1)
+    robo = list(robot.free_robots.values())[0]
+    return robo.id, robo.get_task_from_queue()
+
+
+def populate_init_tasks():
+    num_tasks_assigned = 0
+    print(Bcolors.BOLD + "\nRobot Assignments:" + Bcolors.ENDC)
+    for robo in robot.free_robots.values():
+        print("Robot Name: {}\nTask Assignment:".format(robo.name))
+        for i in range(NUM_AUTO_TASKS):
+            if num_tasks_assigned >= len(robot.to_do):
+                break
+            task_id = num_tasks_assigned
+            robo.queued_tasks.put(task_id)
+            print("     Task name: {}".format(robot.to_do[task_id]))
+            num_tasks_assigned += 1
+
+
+def get_game_mode():
+    """
+    Ask the user if they want to manually
+    assign tasks (recommended) or to have tasks
+    auto assign, starting with 5 tasks
+    :return: the function used to assign tasks
+    """
+    print("Do you want manual task assignment (recommended) or automatic?")
+    while True:
+        game_type = input("Enter '0' for manual, '1' for auto: ")
+        if game_type == '0':
+            return manual_task_assignment
+        elif game_type == '1':
+            populate_init_tasks()
+            # print_assignment(robot.free_robots)
+            return auto_task_assignment
 
 
 def introduce_program():
@@ -139,7 +196,9 @@ def introduce_program():
           "but be careful! Each type of robot has a task "
           "they cannot complete")
     robot.free_robots = get_robots()
+    assign_func = get_game_mode()
     input("Press Enter to begin timer and get to work...")
+    return assign_func
 
 
 def failure():
@@ -157,17 +216,21 @@ def success():
     print("Mom arrives home, impressed you did all that work!")
 
 
-def run():
+def run(assign_func):
     """
     Main loop of the program. Ends when the user
     has completed all the tasks or when the time
     runs out
+    :param: the function used for task assignment
     """
     while len(robot.to_do) > 0:
-        robot_id, assignment_id = get_task_assignment()
+        robot_id, assignment_id = assign_func()
         try:
             robot.free_robots[robot_id].begin_task(assignment_id)
         except robot.ActionExecutionError:
+            continue
+        # TODO
+        except KeyError:
             continue
     print("Waiting for robots to complete tasks...")
     # wait till all threads are completed
@@ -209,16 +272,12 @@ def start_timer():
 
 
 if __name__ == "__main__":
-    # how much time until program stops
-    MAX_TIME = 120  # Time in seconds until mom arrives
-    NUM_ROBOTS = 2  # How many robots
-    NUM_TASKS = 10  # How many tasks to complete
     setup()
-    introduce_program()
+    assignment_func = introduce_program()
     start_timer()
     # TODO have the two robots randomly complete 5 tasks each
     # TODO instead of user input, it just takes input from two queues
     # User create queues before execution? Maybe during execution
     # if all robots cannot do task end the program
     # if a task is unacomplishable by the robot, reassign it
-    run()
+    run(assignment_func)

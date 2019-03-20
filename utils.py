@@ -15,6 +15,20 @@ def convert_to_sec(milli):
     return milli / 1000
 
 
+# def print_assignment(robots):
+#     """
+#     Print out the generated assignment
+#     queues for each robot
+#     :param robots: all the robots
+#     :return:
+#     """
+#     print(Bcolors.BOLD + "\nRobot Assignments:" + Bcolors.ENDC)
+#     for robo in robots.values():
+#         print("Robot Name: {}, task assignment:".format(robo.name))
+#         for item in robo.queued_tasks:
+
+
+
 def print_tasks(task_list):
     """
     Proper print of tasks
@@ -35,6 +49,8 @@ def print_robots(robots):
     :param robots: the list of robots
     :return:
     """
+    if len(robots) == 0:
+        return ""
     ret_str = Bcolors.BOLD + "Robots Available:\n" + Bcolors.ENDC
     for index in robots:
         ret_str += "{}: {} {}\n".format(robots[index].id,
@@ -74,7 +90,19 @@ def update_interface(to_do, free_robots, notifications):
     print(print_tasks(to_do))
     print(print_robots(free_robots))
     print(print_notifications(notifications))
+
+
+def update_interactive_inter(to_do, free_robots, notifications):
+    """
+    Update the interface if it is in interactive mode
+    :param to_do:
+    :param free_robots:
+    :param notifications:
+    :return:
+    """
+    update_interface(to_do, free_robots, notifications)
     print(Bcolors.BOLD + "\nTask Assignment:" + Bcolors.ENDC)
+
 
 
 class Bcolors:

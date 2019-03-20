@@ -78,7 +78,6 @@ class Robot(ABC):
         otherwise just choose one from the to_do
         :return:
         """
-        # FIXME TEST
         if not self.queued_tasks.empty():
             task_id = self.queued_tasks.get()
         else:
