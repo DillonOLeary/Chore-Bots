@@ -180,7 +180,7 @@ def get_game_mode():
 def introduce_program():
     """
     Output the strings that introduce the
-    program to the user and create the robots
+    program to user and create the robots
     :return:
     """
     for x in range(30):
