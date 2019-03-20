@@ -20,6 +20,12 @@ to run, just enter in your terminal
 python main.py
 ```
 
+## Files
+main.py - the main execution handling
+utils.py - utils used by other modules
+robot.py - defines the behavior of each robot
+data.json - hard coded data, such as task names and adverbs
+
 
 # Task Prompt
 Use any language to complete this challenge. The implementation is up to you: it can be a command-line application or have a graphical interface.

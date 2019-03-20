@@ -23,7 +23,7 @@ bot_threads = []  # all the threads running
 list_lock = threading.Lock()
 
 # Set up all the hard coded values
-with open('config.json', 'r') as json_file:
+with open('data.json', 'r') as json_file:
     json = json.load(json_file)
     adverbs = json["adverbs"]
     robot_types = json["robot_types"]
