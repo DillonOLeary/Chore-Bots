@@ -1,4 +1,27 @@
 # BOT-O-MAT
+Welcome to bot-o-mat. You've got work to do!!
+
+In this game, you will try to complete all your chores before mom gets home. User input, except robot names, is done through selecting the index of the option you want.
+
+There are two game modes: manual and automatic.
+- manual: you assign the robots tasks as the game runs
+- automatic: robots are automatically assigned tasks, starting with a queue of 5 tasks
+
+There are two phases of the game:
+1. Setup: naming robots and setting their type, selecting a game mode
+2. Doing Chores: Either manually assigning the robots chores or allowing the robots to automatically take on their own chores
+
+The game concludes when either the time runs out or all the chores are completed. Keep in mind there are tasks that each robot cannot complete!
+
+
+## Running the Program
+to run, just enter in your terminal
+```
+python main.py
+```
+
+
+# Task Prompt
 Use any language to complete this challenge. The implementation is up to you: it can be a command-line application or have a graphical interface.
 
 Your application should collect a name and robot type from the types we list below. For each, it should create a Robot of the type the user chooses, e.g. Larry, Bipedal. 

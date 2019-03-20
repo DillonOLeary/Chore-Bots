@@ -15,20 +15,6 @@ def convert_to_sec(milli):
     return milli / 1000
 
 
-# def print_assignment(robots):
-#     """
-#     Print out the generated assignment
-#     queues for each robot
-#     :param robots: all the robots
-#     :return:
-#     """
-#     print(Bcolors.BOLD + "\nRobot Assignments:" + Bcolors.ENDC)
-#     for robo in robots.values():
-#         print("Robot Name: {}, task assignment:".format(robo.name))
-#         for item in robo.queued_tasks:
-
-
-
 def print_tasks(task_list):
     """
     Proper print of tasks
@@ -102,7 +88,6 @@ def update_interactive_inter(to_do, free_robots, notifications):
     """
     update_interface(to_do, free_robots, notifications)
     print(Bcolors.BOLD + "\nTask Assignment:" + Bcolors.ENDC)
-
 
 
 class Bcolors:

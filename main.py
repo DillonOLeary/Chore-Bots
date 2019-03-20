@@ -16,7 +16,7 @@ from utils import Bcolors, update_interface, update_interactive_inter
 # GLOBALS
 MAX_TIME = 120  # Time in seconds until mom arrives
 NUM_ROBOTS = 2  # How many robots
-NUM_TASKS = 20  # How many tasks to complete
+NUM_TASKS = 15  # How many tasks to complete
 NUM_AUTO_TASKS = 5  # How many tasks red ventures requires I assign initially
 
 
@@ -146,16 +146,21 @@ def auto_task_assignment():
 
 
 def populate_init_tasks():
+    """
+    Create the initial tasks.
+    Outputs the tasks as the function runs
+    :return:
+    """
     num_tasks_assigned = 0
-    print(Bcolors.BOLD + "\nRobot Assignments:" + Bcolors.ENDC)
+    print(Bcolors.BOLD + "\nInitial Robot Task Queues:" + Bcolors.ENDC)
     for robo in robot.free_robots.values():
-        print("Robot Name: {}\nTask Assignment:".format(robo.name))
+        print("Robot Name: {}\nTask Assignments:".format(robo.name))
         for i in range(NUM_AUTO_TASKS):
             if num_tasks_assigned >= len(robot.to_do):
                 break
             task_id = num_tasks_assigned
             robo.queued_tasks.put(task_id)
-            print("     Task name: {}".format(robot.to_do[task_id]))
+            print("     Task: {}".format(robot.to_do[task_id]['description']))
             num_tasks_assigned += 1
 
 
@@ -231,7 +236,8 @@ def run(assign_func):
             continue
         except KeyError:
             continue
-    print("Waiting for robots to complete tasks...")
+    robot.notifications.append("Waiting for robots to complete tasks...\n")
+    update_interface(robot.to_do, robot.free_robots, robot.notifications)
     # wait till all threads are completed
     for thread in robot.bot_threads:
         thread.join()

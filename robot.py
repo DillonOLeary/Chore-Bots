@@ -20,7 +20,6 @@ busy_robots = {}  # the robots doing tasks
 free_robots: Dict[Any, Any] = {}  # the robots available to work
 prompt = ""  # the input prompt
 bot_threads = []  # all the threads running
-# active_threads_lock = threading.Lock()
 list_lock = threading.Lock()
 
 # Set up all the hard coded values
@@ -49,6 +48,7 @@ class Robot(ABC):
         self.id = Robot.num_robots
         Robot.num_robots += 1
         self.robo_type = robo_type
+
         # for automatic task assignment
         self.queued_tasks = Queue()  # used for auto task assignment
         self.attempted_task_id = -1  # counter for attempted task id
