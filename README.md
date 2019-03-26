@@ -1,5 +1,5 @@
-# BOT-O-MAT
-Welcome to bot-o-mat. You've got work to do!!
+# Chore Bots
+Welcome to Chore Bots. You've got work to do!!
 
 In this game, you will try to complete all your chores before mom gets home. User input, except robot names, is done through selecting the index of the option you want.
 
